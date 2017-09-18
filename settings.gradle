@@ -1,1 +1,1 @@
-include ':app', ':easypermissions'
+include ':easypermissions', ':app'

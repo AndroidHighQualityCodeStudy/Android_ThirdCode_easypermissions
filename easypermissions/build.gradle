@@ -1,32 +1,30 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion compileSdk
-    buildToolsVersion buildTools
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion targetSdk
+        minSdkVersion 15
+        targetSdkVersion 26
         versionCode 1
-        versionName mavenVersion
+        versionName "1.0"
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            consumerProguardFiles 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
 dependencies {
-    api "com.android.support:appcompat-v7:$support_library_version"
-    api "com.android.support:support-compat:$support_library_version"
-    api "com.android.support:support-fragment:$support_library_version"
-
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:3.4.2'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
-
-apply from: 'maven.gradle'
-apply from: 'bintray.gradle'
