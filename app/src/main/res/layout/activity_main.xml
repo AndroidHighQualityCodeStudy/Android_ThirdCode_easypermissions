@@ -13,13 +13,13 @@
         android:id="@+id/button_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/camera" />
+        android:text="摄像机权限" />
 
     <Button
         android:id="@+id/button_location_and_contacts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/location_and_contacts" />
+        android:text="位置和联系人" />
 
     <fragment
         android:id="@+id/fragment"

@@ -54,6 +54,7 @@ public class EasyPermissions {
     private static final String TAG = "EasyPermissions";
 
     /**
+     * 检测是否有权限缺失
      * Check if the calling context has a set of permissions.
      *
      * @param context the calling context.
@@ -64,68 +65,82 @@ public class EasyPermissions {
      */
     public static boolean hasPermissions(Context context, @NonNull String... perms) {
         // Always return true for SDK < M, let the system deal with the permissions
+        // 如果是6.0以下，都按有权限计算
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.w(TAG, "hasPermissions: API version < M, returning true by default");
-
             // DANGER ZONE!!! Changing this will break the library.
             return true;
         }
 
         // Null context may be passed if we have detected Low API (less than M) so getting
         // to this point with a null context should not be possible.
+        // context 空指针判断
         if (context == null) {
             throw new IllegalArgumentException("Can't check permissions for null context");
         }
 
+        // 有一个权限被拒绝，则返回false
         for (String perm : perms) {
             if (ContextCompat.checkSelfPermission(context, perm)
                     != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }
-
         return true;
     }
 
     /**
+     * 请求权限 Activity
+     * <p>
      * Request permissions from an Activity with standard OK/Cancel buttons.
      *
      * @see #requestPermissions(Activity, String, int, int, int, String...)
      */
-    public static void requestPermissions(
-            @NonNull Activity host, @NonNull String rationale,
-            int requestCode, @NonNull String... perms) {
+    public static void requestPermissions(@NonNull Activity host,
+                                          @NonNull String rationale,
+                                          int requestCode,
+                                          @NonNull String... perms) {
         requestPermissions(host, rationale, android.R.string.ok, android.R.string.cancel,
                 requestCode, perms);
     }
 
     /**
+     * 请求权限 fragment
+     * <p>
      * Request permissions from a Support Fragment with standard OK/Cancel buttons.
      *
      * @see #requestPermissions(Activity, String, int, int, int, String...)
      */
     public static void requestPermissions(
-            @NonNull Fragment host, @NonNull String rationale,
-            int requestCode, @NonNull String... perms) {
+            @NonNull Fragment host,
+            @NonNull String rationale,
+            int requestCode,
+            @NonNull String... perms) {
 
         requestPermissions(host, rationale, android.R.string.ok, android.R.string.cancel,
                 requestCode, perms);
     }
 
     /**
+     * 请求权限 android.app.Fragment
+     * <p>
      * Request permissions from a standard Fragment with standard OK/Cancel buttons.
      *
      * @see #requestPermissions(Activity, String, int, int, int, String...)
      */
     public static void requestPermissions(
-            @NonNull android.app.Fragment host, @NonNull String rationale,
-            int requestCode, @NonNull String... perms) {
+            @NonNull android.app.Fragment host,
+            @NonNull String rationale,
+            int requestCode,
+            @NonNull String... perms) {
 
         requestPermissions(host, rationale, android.R.string.ok, android.R.string.cancel,
                 requestCode, perms);
     }
 
     /**
+     * 请求权限 Activity
+     * <p>
      * Request a set of permissions, showing rationale if the system requests it.
      *
      * @param host           requesting context.
@@ -138,9 +153,12 @@ public class EasyPermissions {
      * @see Manifest.permission
      */
     public static void requestPermissions(
-            @NonNull Activity host, @NonNull String rationale,
-            @StringRes int positiveButton, @StringRes int negativeButton,
-            int requestCode, @NonNull String... perms) {
+            @NonNull Activity host,
+            @NonNull String rationale,
+            @StringRes int positiveButton,
+            @StringRes int negativeButton,
+            int requestCode,
+            @NonNull String... perms) {
         requestPermissions(PermissionHelper.newInstance(host), rationale,
                 positiveButton, negativeButton,
                 requestCode, perms);
@@ -172,23 +190,39 @@ public class EasyPermissions {
                 requestCode, perms);
     }
 
+    /**
+     * 请求权限
+     *
+     * @param helper
+     * @param rationale
+     * @param positiveButton
+     * @param negativeButton
+     * @param requestCode
+     * @param perms
+     */
     private static void requestPermissions(
-            @NonNull PermissionHelper helper, @NonNull String rationale,
-            @StringRes int positiveButton, @StringRes int negativeButton,
-            int requestCode, @NonNull String... perms) {
+            @NonNull PermissionHelper helper,
+            @NonNull String rationale,
+            @StringRes int positiveButton,
+            @StringRes int negativeButton,
+            int requestCode,
+            @NonNull String... perms) {
 
+        // 如果所有权限都存在
         // Check for permissions before dispatching the request
         if (hasPermissions(helper.getContext(), perms)) {
             notifyAlreadyHasPermissions(helper.getHost(), requestCode, perms);
             return;
         }
-
+        // 有未赋予的权限，则请求权限
         // Request permissions
         helper.requestPermissions(rationale, positiveButton,
                 negativeButton, requestCode, perms);
     }
 
     /**
+     * 回调权限授予情况
+     * <p>
      * Handle the result of a permission request, should be called from the calling {@link
      * Activity}'s {@link ActivityCompat.OnRequestPermissionsResultCallback#onRequestPermissionsResult(int,
      * String[], int[])} method.
@@ -207,6 +241,8 @@ public class EasyPermissions {
                                                   @NonNull String[] permissions,
                                                   @NonNull int[] grantResults,
                                                   @NonNull Object... receivers) {
+
+        // 分为两个数组，权限授予数组与权限未被授予数组
         // Make a collection of granted and denied permissions from the request.
         List<String> granted = new ArrayList<>();
         List<String> denied = new ArrayList<>();
@@ -218,7 +254,7 @@ public class EasyPermissions {
                 denied.add(perm);
             }
         }
-
+        // 回调权限被授予
         // iterate through all receivers
         for (Object object : receivers) {
             // Report granted permissions, if any.
@@ -227,14 +263,14 @@ public class EasyPermissions {
                     ((PermissionCallbacks) object).onPermissionsGranted(requestCode, granted);
                 }
             }
-
+            // 回调权限被拒绝
             // Report denied permissions, if any.
             if (!denied.isEmpty()) {
                 if (object instanceof PermissionCallbacks) {
                     ((PermissionCallbacks) object).onPermissionsDenied(requestCode, denied);
                 }
             }
-
+            // 如果权限被全部授予，则回调AfterPermissionGranted注解方法
             // If 100% successful, call annotated methods
             if (!granted.isEmpty() && denied.isEmpty()) {
                 runAnnotatedMethods(object, requestCode);
@@ -333,6 +369,8 @@ public class EasyPermissions {
     }
 
     /**
+     * 回调，权限全部被授予
+     * <p>
      * Run permission callbacks on an object that requested permissions but already has them by
      * simulating {@link PackageManager#PERMISSION_GRANTED}.
      *
@@ -343,15 +381,18 @@ public class EasyPermissions {
     private static void notifyAlreadyHasPermissions(@NonNull Object object,
                                                     int requestCode,
                                                     @NonNull String[] perms) {
+        // 构造权限全部被授予的 int[] grantResults
         int[] grantResults = new int[perms.length];
         for (int i = 0; i < perms.length; i++) {
             grantResults[i] = PackageManager.PERMISSION_GRANTED;
         }
-
+        // 回调权限授予情况
         onRequestPermissionsResult(requestCode, perms, grantResults, object);
     }
 
     /**
+     * 回调 AfterPermissionGranted 注解方法
+     * <p>
      * Find all methods annotated with {@link AfterPermissionGranted} on a given object with the
      * correct requestCode argument.
      *
@@ -365,22 +406,27 @@ public class EasyPermissions {
         }
 
         while (clazz != null) {
+            // 查找其对应的全部方法
             for (Method method : clazz.getDeclaredMethods()) {
+                // 查找AfterPermissionGranted注解的方法
                 AfterPermissionGranted ann = method.getAnnotation(AfterPermissionGranted.class);
                 if (ann != null) {
                     // Check for annotated methods with matching request code.
+                    // 对比注解中指定的value
                     if (ann.value() == requestCode) {
+                        // 必须为无返回参数的方法
                         // Method must be void so that we can invoke it
                         if (method.getParameterTypes().length > 0) {
                             throw new RuntimeException(
                                     "Cannot execute method " + method.getName() + " because it is non-void method and/or has input parameters.");
                         }
-
+                        //
                         try {
                             // Make method accessible if private
                             if (!method.isAccessible()) {
                                 method.setAccessible(true);
                             }
+                            // 调用该方法
                             method.invoke(object);
                         } catch (IllegalAccessException e) {
                             Log.e(TAG, "runDefaultMethod:IllegalAccessException", e);

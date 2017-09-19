@@ -23,10 +23,11 @@ public abstract class PermissionHelper<T> {
 
     @NonNull
     public static PermissionHelper newInstance(Activity host) {
+        // 小于android 6.0的情况
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return new LowApiPermissionsHelper(host);
         }
-
+        //
         if (host instanceof AppCompatActivity) {
             return new AppCompatActivityPermissionHelper((AppCompatActivity) host);
         } else {
@@ -60,6 +61,12 @@ public abstract class PermissionHelper<T> {
         mHost = host;
     }
 
+    /**
+     * 是否需要给出请求权限的原因
+     *
+     * @param perms
+     * @return
+     */
     public boolean shouldShowRationale(@NonNull String... perms) {
         for (String perm : perms) {
             if (shouldShowRequestPermissionRationale(perm)) {
@@ -69,12 +76,24 @@ public abstract class PermissionHelper<T> {
         return false;
     }
 
+    /**
+     * 请求权限
+     *
+     * @param rationale
+     * @param positiveButton
+     * @param negativeButton
+     * @param requestCode
+     * @param perms
+     */
     public void requestPermissions(@NonNull String rationale,
                                    @StringRes int positiveButton,
                                    @StringRes int negativeButton,
                                    int requestCode,
                                    @NonNull String... perms) {
+
+        // 是否需要给出请求权限的原因
         if (shouldShowRationale(perms)) {
+            //
             showRequestPermissionRationale(
                     rationale, positiveButton, negativeButton, requestCode, perms);
         } else {
@@ -82,6 +101,12 @@ public abstract class PermissionHelper<T> {
         }
     }
 
+    /**
+     * 权限是否被永久拒绝
+     *
+     * @param perms
+     * @return
+     */
     public boolean somePermissionPermanentlyDenied(@NonNull List<String> perms) {
         for (String deniedPermission : perms) {
             if (permissionPermanentlyDenied(deniedPermission)) {
@@ -92,6 +117,12 @@ public abstract class PermissionHelper<T> {
         return false;
     }
 
+    /**
+     * 权限是否被永久拒绝
+     *
+     * @param perms
+     * @return
+     */
     public boolean permissionPermanentlyDenied(@NonNull String perms) {
         return !shouldShowRequestPermissionRationale(perms);
     }
@@ -109,6 +140,12 @@ public abstract class PermissionHelper<T> {
     // Public abstract methods
     // ============================================================================
 
+    /**
+     * 请求对应权限
+     *
+     * @param requestCode
+     * @param perms
+     */
     public abstract void directRequestPermissions(int requestCode, @NonNull String... perms);
 
     public abstract boolean shouldShowRequestPermissionRationale(@NonNull String perm);
@@ -118,6 +155,7 @@ public abstract class PermissionHelper<T> {
                                                         @StringRes int negativeButton,
                                                         int requestCode,
                                                         @NonNull String... perms);
+
     public abstract Context getContext();
 
 }

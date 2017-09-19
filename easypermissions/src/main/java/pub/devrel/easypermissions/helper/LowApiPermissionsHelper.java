@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 
 /**
  * Permissions helper for apps built against API < 23, which do not need runtime permissions.
+ * <p>
+ * 小于android 6.0的情况
  */
 class LowApiPermissionsHelper extends PermissionHelper<Object> {
 
@@ -12,6 +14,12 @@ class LowApiPermissionsHelper extends PermissionHelper<Object> {
         super(host);
     }
 
+    /**
+     * 6.9以下，不需要请求权限
+     *
+     * @param requestCode
+     * @param perms
+     */
     @Override
     public void directRequestPermissions(int requestCode, @NonNull String... perms) {
         throw new IllegalStateException("Should never be requesting permissions on API < 23!");

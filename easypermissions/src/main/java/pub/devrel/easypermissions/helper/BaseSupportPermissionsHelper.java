@@ -16,12 +16,22 @@ public abstract class BaseSupportPermissionsHelper<T> extends PermissionHelper<T
 
     public abstract FragmentManager getSupportFragmentManager();
 
+    /**
+     * 申请权限 原因 弹窗
+     *
+     * @param rationale
+     * @param positiveButton
+     * @param negativeButton
+     * @param requestCode
+     * @param perms
+     */
     @Override
     public void showRequestPermissionRationale(@NonNull String rationale,
                                                int positiveButton,
                                                int negativeButton,
                                                int requestCode,
                                                @NonNull String... perms) {
+        // 申请 权限 原因的弹窗
         RationaleDialogFragmentCompat
                 .newInstance(positiveButton, negativeButton, rationale, requestCode, perms)
                 .show(getSupportFragmentManager(), RationaleDialogFragmentCompat.TAG);

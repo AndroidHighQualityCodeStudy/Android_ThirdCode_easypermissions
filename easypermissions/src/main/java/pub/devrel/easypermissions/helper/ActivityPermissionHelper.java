@@ -25,6 +25,12 @@ class ActivityPermissionHelper extends BaseFrameworkPermissionsHelper<Activity> 
         ActivityCompat.requestPermissions(getHost(), perms, requestCode);
     }
 
+    /**
+     * 是否需要给出请求权限的原因
+     *
+     * @param perm
+     * @return
+     */
     @Override
     public boolean shouldShowRequestPermissionRationale(@NonNull String perm) {
         return ActivityCompat.shouldShowRequestPermissionRationale(getHost(), perm);

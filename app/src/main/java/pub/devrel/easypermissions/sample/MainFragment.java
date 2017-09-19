@@ -1,6 +1,7 @@
 package pub.devrel.easypermissions.sample;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -49,6 +50,10 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
+
+
+    // #######################################请求message##############################################
+
     @AfterPermissionGranted(RC_SMS_PERM)
     private void smsTask() {
         if (EasyPermissions.hasPermissions(getContext(), Manifest.permission.READ_SMS)) {
@@ -60,6 +65,9 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                     RC_SMS_PERM, Manifest.permission.READ_SMS);
         }
     }
+
+
+    // #####################################################################################
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
